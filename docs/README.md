@@ -16,3 +16,6 @@ Este proyecto consiste en el desarrollo de una plataforma web para la práctica 
 ## Estructura
 - docs/: documentación del proyecto
 - src/: código fuente
+
+## Mejoras
+Se actualizó la documentación del proyecto.
