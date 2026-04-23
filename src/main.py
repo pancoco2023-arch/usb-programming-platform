@@ -30,5 +30,11 @@ def enviar_solucion():
         "lenguaje": data.get("lenguaje")
     })
 
+@app.route('/test')
+def test():
+    return jsonify({
+        "mensaje": "Endpoint de prueba funcionando"
+    })
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
