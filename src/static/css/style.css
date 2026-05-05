@@ -1,1 +1,400 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #020617;
+    color: white;
+}
 
+.auth-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, #1d4ed8, transparent 30%),
+        radial-gradient(circle at bottom right, #7c3aed, transparent 25%),
+        #020617;
+}
+
+.auth-card {
+    background: rgba(30, 41, 59, 0.95);
+    padding: 34px;
+    border-radius: 18px;
+    width: 340px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.logo-box {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.logo-icon {
+    background: #2563eb;
+    color: white;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.auth-card h1 {
+    font-size: 24px;
+    margin: 0;
+    text-align: center;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: #cbd5e1;
+    font-size: 14px;
+    margin-bottom: 22px;
+}
+
+.auth-card label {
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+input, textarea, button {
+    width: 100%;
+    padding: 11px;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: none;
+    box-sizing: border-box;
+}
+
+input, textarea {
+    background: #0f172a;
+    color: white;
+    outline: none;
+}
+
+input:focus, textarea:focus {
+    border: 1px solid #3b82f6;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 18px;
+}
+
+button:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+button:disabled {
+    background: #475569;
+    cursor: not-allowed;
+}
+
+.error-box {
+    background: #7f1d1d;
+    color: #fecaca;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.page-container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-link,
+.filters a,
+.solve-btn,
+.primary-btn,
+.logout-btn,
+.secondary-btn {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-link {
+    background: #334155;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.filters {
+    margin: 20px 0;
+}
+
+.filters a {
+    background: #1e293b;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-right: 8px;
+}
+
+.filters a:hover {
+    background: #334155;
+}
+
+.hero-card {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    padding: 30px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hero-card h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.hero-card p {
+    color: #cbd5e1;
+    max-width: 600px;
+}
+
+.logout-btn {
+    background: #ef4444;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 25px;
+}
+
+.dashboard-card {
+    background: #1e293b;
+    padding: 22px;
+    border-radius: 14px;
+}
+
+.dashboard-card h2 {
+    margin-top: 0;
+}
+
+.dashboard-card p {
+    color: #cbd5e1;
+    min-height: 50px;
+}
+
+.primary-btn {
+    display: inline-block;
+    background: #2563eb;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+}
+
+.secondary-btn {
+    display: inline-block;
+    background: #334155;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.secondary-btn:hover {
+    background: #475569;
+}
+
+.problem-table {
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-header,
+.table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 15px;
+    align-items: center;
+}
+
+.table-header {
+    background: #1e293b;
+    color: #cbd5e1;
+    font-weight: bold;
+}
+
+.table-row {
+    border-top: 1px solid #334155;
+}
+
+.table-row:hover {
+    background: #111827;
+}
+
+.difficulty {
+    font-weight: bold;
+}
+
+.easy {
+    color: #22c55e;
+}
+
+.medium {
+    color: #facc15;
+}
+
+.hard {
+    color: #ef4444;
+}
+
+.solve-btn {
+    background: #2563eb;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.solve-btn:hover {
+    background: #1d4ed8;
+}
+
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+.left {
+    width: 50%;
+    padding: 24px;
+    background: #0f172a;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.right {
+    width: 50%;
+    padding: 24px;
+    background: #020617;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 70vh;
+    background: #1e293b;
+    color: white;
+    font-family: monospace;
+    resize: none;
+}
+
+.case {
+    background: #1e293b;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 8px;
+}
+
+.result-card {
+    background: #1e293b;
+    padding: 40px;
+    border-radius: 18px;
+    text-align: center;
+    max-width: 600px;
+    margin: 100px auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.result-icon {
+    width: 60px;
+    height: 60px;
+    background: #22c55e;
+    color: #052e16;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 18px;
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.result-card h1 {
+    margin-bottom: 10px;
+}
+
+.result-card p {
+    color: #cbd5e1;
+}
+
+.result-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.result-icon.success {
+    background: #22c55e;
+    color: #052e16;
+}
+
+.result-icon.error {
+    background: #ef4444;
+    color: #7f1d1d;
+}
+
+.status {
+    font-weight: bold;
+}
+
+.status.accepted {
+    color: #22c55e;
+}
+
+.status.wrong {
+    color: #ef4444;
+}
+
+.status.pending {
+    color: #94a3b8;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: #1e293b;
+    padding: 25px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.stat-card h2 {
+    font-size: 32px;
+    margin: 0;
+    color: #22c55e;
+}
+
+.stat-card p {
+    color: #cbd5e1;
+}
