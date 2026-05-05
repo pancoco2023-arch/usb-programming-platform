@@ -1,40 +1,274 @@
-"""
-Archivo principal del backend del sistema.
-API básica para la plataforma de práctica de programación.
-"""
-
-from flask import Flask, jsonify, request
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-@app.route('/')
+# Conexión PostgreSQL
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:diegopdiddy23@localhost:4420/usb_programming_platform"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.secret_key = "clave_secreta"
+
+db = SQLAlchemy(app)
+
+# MODELOS / TABLAS
+
+class User(db.Model):
+    __tablename__ = "user"
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    rol = db.Column(db.String(20), nullable=False, default="estudiante")
+
+
+class Problem(db.Model):
+    __tablename__ = "problem"
+
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(150), nullable=False)
+    descripcion = db.Column(db.Text, nullable=False)
+    dificultad = db.Column(db.String(20), nullable=False)
+    categoria = db.Column(db.String(50), nullable=False)
+
+
+class Solution(db.Model):
+    __tablename__ = "solution"
+
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.Text, nullable=False)
+    lenguaje = db.Column(db.String(50), nullable=False)
+    estado = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    problem_id = db.Column(db.Integer, db.ForeignKey("problem.id"))
+
+
+class TestCase(db.Model):
+    __tablename__ = "test_case"
+
+    id = db.Column(db.Integer, primary_key=True)
+    descripcion = db.Column(db.String(200), nullable=False)
+    entrada = db.Column(db.Text, nullable=False)
+    salida_esperada = db.Column(db.Text, nullable=False)
+    es_publico = db.Column(db.Boolean, default=True)
+    problem_id = db.Column(db.Integer, db.ForeignKey("problem.id"))
+
+
+# RUTAS
+
+@app.route("/")
+def index():
+    return redirect(url_for("login"))
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        usuario = User.query.filter_by(email=email, password=password).first()
+
+        if usuario:
+            session["user_id"] = usuario.id
+            session["user_name"] = usuario.nombre
+            return redirect(url_for("home"))
+
+        return render_template("login.html", error="Credenciales incorrectas")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+@app.route("/home")
 def home():
-    return jsonify({
-        "mensaje": "API de la plataforma de práctica de programación"
-    })
+    if "user_id" not in session:
+        return redirect(url_for("login"))
 
-@app.route('/problemas')
-def listar_problemas():
-    problemas = [
-        {"id": 1, "titulo": "Suma de dos números", "dificultad": "Fácil"},
-        {"id": 2, "titulo": "Palíndromo", "dificultad": "Media"}
+    user_id = session["user_id"]
+
+    total_problemas = Problem.query.count()
+
+    soluciones = Solution.query.filter_by(user_id=user_id).all()
+
+    resueltos = sum(1 for s in soluciones if s.estado == "Accepted")
+
+    intentados = len(set(s.problem_id for s in soluciones))
+
+    return render_template(
+        "home.html",
+        nombre=session.get("user_name"),
+        total=total_problemas,
+        resueltos=resueltos,
+        intentados=intentados
+    )
+
+
+@app.route("/problems")
+def problems():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    dificultad = request.args.get("dificultad")
+
+    if dificultad:
+        lista = Problem.query.filter_by(dificultad=dificultad).all()
+    else:
+        lista = Problem.query.all()
+
+    # 🔥 HISTORIAL DEL USUARIO
+    soluciones = Solution.query.filter_by(user_id=session["user_id"]).all()
+
+    estados = {}
+    for s in soluciones:
+        estados[s.problem_id] = s.estado
+
+    return render_template("problems.html", problemas=lista, estados=estados)
+
+
+@app.route("/problem/<int:problem_id>")
+def problem_detail(problem_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    problema = Problem.query.get_or_404(problem_id)
+    casos = TestCase.query.filter_by(problem_id=problem_id, es_publico=True).all()
+
+    return render_template("problem_detail.html", problema=problema, casos=casos)
+
+
+@app.route("/enviar-solucion/<int:problem_id>", methods=["POST"])
+def enviar_solucion(problem_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    codigo = request.form.get("codigo")
+
+    # 🔥 SIMULACIÓN TIPO LEETCODE
+    if codigo and "return" in codigo:
+        estado = "Accepted"
+        mensaje = "✅ Tu solución fue aceptada."
+    else:
+        estado = "Wrong Answer"
+        mensaje = "❌ Tu solución no pasó los casos de prueba."
+
+    nueva_solucion = Solution(
+        codigo=codigo,
+        lenguaje="python",
+        estado=estado,
+        user_id=session["user_id"],
+        problem_id=problem_id
+    )
+
+    db.session.add(nueva_solucion)
+    db.session.commit()
+
+    return render_template("resultado.html", mensaje=mensaje)
+
+@app.route("/api/problems")
+def api_problems():
+    problemas = Problem.query.all()
+
+    data = [
+        {
+            "id": p.id,
+            "titulo": p.titulo,
+            "descripcion": p.descripcion,
+            "dificultad": p.dificultad,
+            "categoria": p.categoria
+        }
+        for p in problemas
     ]
-    return jsonify(problemas)
 
-@app.route('/enviar-solucion', methods=['POST'])
-def enviar_solucion():
-    data = request.json
-    return jsonify({
-        "mensaje": "Solución recibida correctamente",
-        "codigo": data.get("codigo"),
-        "lenguaje": data.get("lenguaje")
-    })
+    return jsonify(data)
 
-@app.route('/test')
+
+@app.route("/test")
 def test():
-    return jsonify({
-        "mensaje": "Endpoint de prueba funcionando"
-    })
-    
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    return jsonify({"mensaje": "Backend funcionando correctamente"})
+
+
+# DATOS INICIALES
+
+def seed_data():
+    if User.query.count() == 0:
+        usuario = User(
+            nombre="Estudiante Demo",
+            email="admin@usb.edu.co",
+            password="1234",
+            rol="estudiante"
+        )
+        db.session.add(usuario)
+
+    if Problem.query.count() == 0:
+        problemas = [
+            Problem(
+                titulo="Two Sum",
+                descripcion="Dado un arreglo de números enteros nums y un número target, retorna los índices de los dos números que suman target.",
+                dificultad="Fácil",
+                categoria="Arrays"
+            ),
+            Problem(
+                titulo="Valid Palindrome",
+                descripcion="Dada una cadena de texto, determina si es un palíndromo ignorando espacios, mayúsculas y signos.",
+                dificultad="Fácil",
+                categoria="Strings"
+            ),
+            Problem(
+                titulo="Maximum Subarray",
+                descripcion="Dado un arreglo de enteros, encuentra la suma máxima de un subarreglo continuo.",
+                dificultad="Media",
+                categoria="Programación dinámica"
+            )
+        ]
+
+        db.session.add_all(problemas)
+
+    db.session.commit()
+
+    if TestCase.query.count() == 0:
+        two_sum = Problem.query.filter_by(titulo="Two Sum").first()
+        palindrome = Problem.query.filter_by(titulo="Valid Palindrome").first()
+        maximum = Problem.query.filter_by(titulo="Maximum Subarray").first()
+
+        casos = [
+            TestCase(
+                descripcion="Caso básico de Two Sum",
+                entrada="nums = [2,7,11,15], target = 9",
+                salida_esperada="[0,1]",
+                es_publico=True,
+                problem_id=two_sum.id
+            ),
+            TestCase(
+                descripcion="Palabra palíndroma",
+                entrada='s = "A man, a plan, a canal: Panama"',
+                salida_esperada="true",
+                es_publico=True,
+                problem_id=palindrome.id
+            ),
+            TestCase(
+                descripcion="Subarreglo máximo",
+                entrada="nums = [-2,1,-3,4,-1,2,1,-5,4]",
+                salida_esperada="6",
+                es_publico=True,
+                problem_id=maximum.id
+            )
+        ]
+
+        db.session.add_all(casos)
+        db.session.commit()
+
+
+# INICIO DE APP
+
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+        seed_data()
+
+    app.run(debug=True)
