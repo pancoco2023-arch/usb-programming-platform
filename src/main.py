@@ -3,14 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Conexión PostgreSQL
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:diegopdiddy23@localhost:4420/usb_programming_platform"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = "clave_secreta"
 
 db = SQLAlchemy(app)
 
-# MODELOS / TABLAS
 
 class User(db.Model):
     __tablename__ = "user"
@@ -54,7 +52,6 @@ class TestCase(db.Model):
     problem_id = db.Column(db.Integer, db.ForeignKey("problem.id"))
 
 
-# RUTAS
 
 @app.route("/")
 def index():
@@ -121,7 +118,6 @@ def problems():
     else:
         lista = Problem.query.all()
 
-    # 🔥 HISTORIAL DEL USUARIO
     soluciones = Solution.query.filter_by(user_id=session["user_id"]).all()
 
     estados = {}
@@ -149,13 +145,12 @@ def enviar_solucion(problem_id):
 
     codigo = request.form.get("codigo")
 
-    # 🔥 SIMULACIÓN TIPO LEETCODE
     if codigo and "return" in codigo:
         estado = "Accepted"
-        mensaje = "✅ Tu solución fue aceptada."
+        mensaje = "Tu solución fue aceptada."
     else:
         estado = "Wrong Answer"
-        mensaje = "❌ Tu solución no pasó los casos de prueba."
+        mensaje = "Tu solución no pasó los casos de prueba."
 
     nueva_solucion = Solution(
         codigo=codigo,
@@ -193,7 +188,6 @@ def test():
     return jsonify({"mensaje": "Backend funcionando correctamente"})
 
 
-# DATOS INICIALES
 
 def seed_data():
     if User.query.count() == 0:
@@ -264,7 +258,6 @@ def seed_data():
         db.session.commit()
 
 
-# INICIO DE APP
 
 if __name__ == "__main__":
     with app.app_context():
