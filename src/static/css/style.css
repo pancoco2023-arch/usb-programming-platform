@@ -398,3 +398,58 @@ textarea {
 .stat-card p {
     color: #cbd5e1;
 }
+
+.language-select {
+    width: 100%;
+    padding: 11px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: none;
+    background: #0f172a;
+    color: white;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.language-select:focus {
+    outline: none;
+    border: 1px solid #3b82f6;
+}
+
+.form-card {
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 16px;
+    margin-top: 20px;
+}
+
+.form-card h2 {
+    margin-top: 0;
+}
+
+.form-card label {
+    display: block;
+    margin-top: 15px;
+    color: #cbd5e1;
+    font-weight: bold;
+}
+
+.form-textarea {
+    height: 120px;
+    background: #0f172a;
+    color: white;
+    resize: vertical;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.checkbox-row input {
+    width: auto;
+    margin: 0;
+}
