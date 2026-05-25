@@ -9,7 +9,6 @@ app.secret_key = "clave_secreta"
 
 db = SQLAlchemy(app)
 
-
 class User(db.Model):
     __tablename__ = "user"
 
@@ -52,7 +51,6 @@ class TestCase(db.Model):
     problem_id = db.Column(db.Integer, db.ForeignKey("problem.id"))
 
 
-
 @app.route("/")
 def index():
     return redirect(url_for("login"))
@@ -69,6 +67,7 @@ def login():
         if usuario:
             session["user_id"] = usuario.id
             session["user_name"] = usuario.nombre
+            session["user_role"] = usuario.rol
             return redirect(url_for("home"))
 
         return render_template("login.html", error="Credenciales incorrectas")
@@ -90,16 +89,14 @@ def home():
     user_id = session["user_id"]
 
     total_problemas = Problem.query.count()
-
     soluciones = Solution.query.filter_by(user_id=user_id).all()
-
     resueltos = sum(1 for s in soluciones if s.estado == "Accepted")
-
     intentados = len(set(s.problem_id for s in soluciones))
 
     return render_template(
         "home.html",
         nombre=session.get("user_name"),
+        rol=session.get("user_role"),
         total=total_problemas,
         resueltos=resueltos,
         intentados=intentados
@@ -124,7 +121,12 @@ def problems():
     for s in soluciones:
         estados[s.problem_id] = s.estado
 
-    return render_template("problems.html", problemas=lista, estados=estados)
+    return render_template(
+        "problems.html",
+        problemas=lista,
+        estados=estados,
+        rol=session.get("user_role")
+    )
 
 
 @app.route("/problem/<int:problem_id>")
@@ -144,6 +146,7 @@ def enviar_solucion(problem_id):
         return redirect(url_for("login"))
 
     codigo = request.form.get("codigo")
+    lenguaje = request.form.get("lenguaje", "python")
 
     if codigo and "return" in codigo:
         estado = "Accepted"
@@ -154,7 +157,7 @@ def enviar_solucion(problem_id):
 
     nueva_solucion = Solution(
         codigo=codigo,
-        lenguaje="python",
+        lenguaje=lenguaje,
         estado=estado,
         user_id=session["user_id"],
         problem_id=problem_id
@@ -164,6 +167,7 @@ def enviar_solucion(problem_id):
     db.session.commit()
 
     return render_template("resultado.html", mensaje=mensaje)
+
 
 @app.route("/api/problems")
 def api_problems():
@@ -188,16 +192,72 @@ def test():
     return jsonify({"mensaje": "Backend funcionando correctamente"})
 
 
+@app.route("/admin/problems/new", methods=["GET", "POST"])
+def crear_problema():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("user_role") != "admin":
+        return render_template(
+            "resultado.html",
+            mensaje="No tienes permisos para crear problemas."
+        )
+
+    if request.method == "POST":
+        titulo = request.form.get("titulo")
+        descripcion = request.form.get("descripcion")
+        dificultad = request.form.get("dificultad")
+        categoria = request.form.get("categoria")
+
+        caso_descripcion = request.form.get("caso_descripcion")
+        entrada = request.form.get("entrada")
+        salida_esperada = request.form.get("salida_esperada")
+        es_publico = request.form.get("es_publico") == "on"
+
+        nuevo_problema = Problem(
+            titulo=titulo,
+            descripcion=descripcion,
+            dificultad=dificultad,
+            categoria=categoria
+        )
+
+        db.session.add(nuevo_problema)
+        db.session.commit()
+
+        nuevo_caso = TestCase(
+            descripcion=caso_descripcion,
+            entrada=entrada,
+            salida_esperada=salida_esperada,
+            es_publico=es_publico,
+            problem_id=nuevo_problema.id
+        )
+
+        db.session.add(nuevo_caso)
+        db.session.commit()
+
+        return render_template(
+            "resultado.html",
+            mensaje="Problema creado correctamente con su caso de prueba."
+        )
+
+    return render_template("admin_problem_form.html")
+
 
 def seed_data():
-    if User.query.count() == 0:
-        usuario = User(
-            nombre="Estudiante Demo",
+    usuario_admin = User.query.filter_by(email="admin@usb.edu.co").first()
+
+    if usuario_admin:
+        usuario_admin.rol = "admin"
+        usuario_admin.nombre = "Administrador Demo"
+        usuario_admin.password = "1234"
+    else:
+        usuario_admin = User(
+            nombre="Administrador Demo",
             email="admin@usb.edu.co",
             password="1234",
-            rol="estudiante"
+            rol="admin"
         )
-        db.session.add(usuario)
+        db.session.add(usuario_admin)
 
     if Problem.query.count() == 0:
         problemas = [
@@ -222,8 +282,7 @@ def seed_data():
         ]
 
         db.session.add_all(problemas)
-
-    db.session.commit()
+        db.session.commit()
 
     if TestCase.query.count() == 0:
         two_sum = Problem.query.filter_by(titulo="Two Sum").first()
@@ -255,8 +314,8 @@ def seed_data():
         ]
 
         db.session.add_all(casos)
-        db.session.commit()
 
+    db.session.commit()
 
 
 if __name__ == "__main__":
