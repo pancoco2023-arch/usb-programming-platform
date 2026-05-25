@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar problema</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="page-container">
+
+    <div class="top-bar">
+        <h1>Agregar nuevo problema</h1>
+        <a href="{{ url_for('problems') }}" class="nav-link">Volver a problemas</a>
+    </div>
+
+    <div class="form-card">
+
+        <form method="POST">
+
+            <h2>Información del problema</h2>
+
+            <label>Título</label>
+            <input type="text" name="titulo" placeholder="Ej: Binary Search" required>
+
+            <label>Descripción</label>
+            <textarea name="descripcion" class="form-textarea" placeholder="Describe el problema..." required></textarea>
+
+            <label>Dificultad</label>
+            <select name="dificultad" class="language-select" required>
+                <option value="Fácil">Fácil</option>
+                <option value="Media">Media</option>
+                <option value="Difícil">Difícil</option>
+            </select>
+
+            <label>Categoría</label>
+            <input type="text" name="categoria" placeholder="Ej: Arrays, Strings, Recursión" required>
+
+            <hr>
+
+            <h2>Caso de prueba</h2>
+
+            <label>Descripción del caso</label>
+            <input type="text" name="caso_descripcion" placeholder="Ej: Caso básico" required>
+
+            <label>Entrada</label>
+            <textarea name="entrada" class="form-textarea" placeholder="Ej: nums = [1,2,3]" required></textarea>
+
+            <label>Salida esperada</label>
+            <textarea name="salida_esperada" class="form-textarea" placeholder="Ej: 6" required></textarea>
+
+            <div class="checkbox-row">
+                <input type="checkbox" name="es_publico" checked>
+                <span>Caso de prueba público</span>
+            </div>
+
+            <button type="submit">Guardar problema</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

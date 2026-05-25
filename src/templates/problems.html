@@ -11,7 +11,13 @@
 
     <div class="top-bar">
         <h1>Problemas</h1>
-        <a href="{{ url_for('home') }}" class="nav-link">Inicio</a>
+
+        <div>
+            {% if rol == "admin" %}
+                <a href="{{ url_for('crear_problema') }}" class="primary-btn">Agregar problema</a>
+            {% endif %}
+            <a href="{{ url_for('home') }}" class="nav-link">Inicio</a>
+        </div>
     </div>
 
     <div class="filters">

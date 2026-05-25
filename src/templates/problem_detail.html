@@ -23,25 +23,70 @@
 
         {% for caso in casos %}
             <div class="case">
+                <p><b>Descripción:</b> {{ caso.descripcion }}</p>
                 <p><b>Entrada:</b> {{ caso.entrada }}</p>
                 <p><b>Salida esperada:</b> {{ caso.salida_esperada }}</p>
             </div>
         {% endfor %}
+
+        <br>
+        <a href="{{ url_for('problems') }}" class="secondary-btn">Volver a problemas</a>
     </div>
 
     <div class="right">
         <h2>Editor de código</h2>
 
         <form method="POST" action="{{ url_for('enviar_solucion', problem_id=problema.id) }}">
-            <textarea name="codigo" placeholder="Escribe tu código aquí..."></textarea>
 
-            <br><br>
+            <label for="lenguaje"><b>Lenguaje de programación</b></label>
+            <select name="lenguaje" id="lenguaje" class="language-select" onchange="cambiarPlantilla()">
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+            </select>
+
+            <textarea id="codigo" name="codigo" placeholder="Escribe tu código aquí..."></textarea>
 
             <button type="submit">Enviar solución</button>
         </form>
     </div>
 
 </div>
+
+<script>
+    const plantillas = {
+        python: `def solution(nums):
+    # Escribe tu solución aquí
+    return nums
+`,
+
+        java: `public class Solution {
+    public static void main(String[] args) {
+        // Escribe tu solución aquí
+        System.out.println("Resultado");
+    }
+}
+`,
+
+        cpp: `#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    // Escribe tu solución aquí
+    return 0;
+}
+`
+    };
+
+    function cambiarPlantilla() {
+        const lenguaje = document.getElementById("lenguaje").value;
+        const editor = document.getElementById("codigo");
+        editor.value = plantillas[lenguaje];
+    }
+
+    window.onload = cambiarPlantilla;
+</script>
 
 </body>
 </html>

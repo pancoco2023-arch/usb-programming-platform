@@ -45,11 +45,13 @@
             <a href="{{ url_for('problems') }}" class="primary-btn">Ir a problemas</a>
         </div>
 
+        {% if rol == "admin" %}
         <div class="dashboard-card">
-            <h2>Estado del sistema</h2>
-            <p>Simulación de evaluación automática activa.</p>
-            <button disabled>Activo</button>
+            <h2>Agregar problema</h2>
+            <p>Crea nuevos problemas y sus casos de prueba.</p>
+            <a href="{{ url_for('crear_problema') }}" class="primary-btn">Crear problema</a>
         </div>
+        {% endif %}
 
         <div class="dashboard-card">
             <h2>Backend</h2>
