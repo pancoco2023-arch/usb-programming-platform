@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial del sistema</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="page-container">
+
+    <div class="top-bar">
+        <h1>Historial del sistema</h1>
+        <a href="{{ url_for('home') }}" class="nav-link">Inicio</a>
+    </div>
+
+    <div class="form-card">
+        <form method="GET" class="filters-form">
+            <input type="text" name="usuario" placeholder="Filtrar por correo">
+            <input type="text" name="tipo_evento" placeholder="Filtrar por evento">
+            <input type="date" name="fecha">
+            <button type="submit">Filtrar</button>
+        </form>
+    </div>
+
+    <div class="problem-table">
+
+        <div class="table-header log-header">
+            <span>Fecha y hora</span>
+            <span>Usuario</span>
+            <span>Evento</span>
+            <span>Descripción</span>
+        </div>
+
+        {% for evento in eventos %}
+        <div class="table-row log-row">
+            <span>{{ evento.fecha_hora }}</span>
+
+            {% if evento.user_id in usuarios %}
+                <span>{{ usuarios[evento.user_id].email }}</span>
+            {% else %}
+                <span>Sistema</span>
+            {% endif %}
+
+            <span>{{ evento.tipo_evento }}</span>
+            <span>{{ evento.descripcion }}</span>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
