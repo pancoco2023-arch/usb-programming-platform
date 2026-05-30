@@ -30,6 +30,7 @@
         {% endfor %}
 
         <br>
+
         <a href="{{ url_for('problems') }}" class="secondary-btn">Volver a problemas</a>
     </div>
 
@@ -39,6 +40,7 @@
         <form method="POST" action="{{ url_for('enviar_solucion', problem_id=problema.id) }}">
 
             <label for="lenguaje"><b>Lenguaje de programación</b></label>
+
             <select name="lenguaje" id="lenguaje" class="language-select" onchange="cambiarPlantilla()">
                 <option value="python">Python</option>
                 <option value="java">Java</option>
@@ -56,13 +58,11 @@
 <script>
     const plantillas = {
         python: `def solution(nums):
-    # Escribe tu solución aquí
     return nums
 `,
 
         java: `public class Solution {
     public static void main(String[] args) {
-        // Escribe tu solución aquí
         System.out.println("Resultado");
     }
 }
@@ -73,7 +73,6 @@
 using namespace std;
 
 int main() {
-    // Escribe tu solución aquí
     return 0;
 }
 `

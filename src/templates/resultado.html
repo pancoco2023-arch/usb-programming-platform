@@ -10,8 +10,10 @@
 <div class="page-container">
 
     <div class="result-card">
-        
-        {% if "aceptada" in mensaje %}
+
+        {% set mensaje_lower = mensaje|lower %}
+
+        {% if tipo == "success" or "aceptada" in mensaje_lower or "correctamente" in mensaje_lower %}
             <div class="result-icon success">✓</div>
         {% else %}
             <div class="result-icon error">✗</div>

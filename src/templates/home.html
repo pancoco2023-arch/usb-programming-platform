@@ -51,13 +51,13 @@
             <p>Crea nuevos problemas y sus casos de prueba.</p>
             <a href="{{ url_for('crear_problema') }}" class="primary-btn">Crear problema</a>
         </div>
-        {% endif %}
 
         <div class="dashboard-card">
-            <h2>Backend</h2>
-            <p>Flask + PostgreSQL funcionando.</p>
-            <button disabled>Conectado</button>
+            <h2>Historial del sistema</h2>
+            <p>Consulta eventos de inicio de sesión, soluciones y creación de problemas.</p>
+            <a href="{{ url_for('historial_sistema') }}" class="primary-btn">Ver historial</a>
         </div>
+        {% endif %}
 
     </div>
 
